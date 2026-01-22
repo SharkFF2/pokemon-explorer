@@ -23,5 +23,16 @@ export interface Pokemon {
   name: string;
   stats: PokemonStat[];
   sprites: PokemonSprites;
+  species: {
+    name: string;
+    url: string;
+  };
+  types: Array<{
+    slot: number;
+    type: {
+      name: string;
+      url: string;
+    };
+  }>;
 }
 
