@@ -30,7 +30,7 @@ export function RarityBadge({ rarity, isShiny }: RarityBadgeProps) {
   return (
     <>
       {badgeText && (
-        <span className={`px-2 py-1 text-xs font-bold rounded-md shadow-md ${badgeClass}`}>
+        <span className={`px-2 py-1 text-xs font-bold rounded-md shadow-md whitespace-nowrap ${badgeClass}`}>
           {badgeText}
         </span>
       )}

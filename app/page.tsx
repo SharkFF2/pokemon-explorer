@@ -58,10 +58,8 @@ export default function HomePage() {
     legendary: new Set(LEGENDARY_LIST),
   }), []);
 
-
-const handleSearch = useCallback(async (e?: FormEvent) => {
-  if (e) e.preventDefault();
-  if (!query.trim()) return;
+const performSearch = useCallback(async (searchQuery: string) => {
+  if (!searchQuery.trim()) return;
 
   setLoading(true);
   setError(null);
@@ -69,7 +67,7 @@ const handleSearch = useCallback(async (e?: FormEvent) => {
 
   try {
     const res = await fetch(
-      `https://pokeapi.co/api/v2/pokemon/${query.toLowerCase().trim()}`
+      `https://pokeapi.co/api/v2/pokemon/${searchQuery.toLowerCase().trim()}`
     );
     if (!res.ok) {
       throw new Error("Pokémon not found");
@@ -105,7 +103,12 @@ const handleSearch = useCallback(async (e?: FormEvent) => {
   } finally {
     setLoading(false);
   }
-}, [query, raritySets]);
+}, [raritySets]);
+
+const handleSearch = useCallback(async (e?: FormEvent) => {
+  if (e) e.preventDefault();
+  performSearch(query);
+}, [query, performSearch]);
 
   // RANDOM POKÉMON GENERATOR
   const rollRarity = (): Rarity => {
@@ -283,7 +286,7 @@ const handleSearch = useCallback(async (e?: FormEvent) => {
         {pokemon && (
           <RegionSelector
             speciesUrl={pokemon.species.url}
-            onSelectForm={(name) => setQuery(name)}
+            onSelectForm={(name) => performSearch(name)}
           />
         )}
 

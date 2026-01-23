@@ -5,6 +5,7 @@ type Variety = {
   pokemon: {
     name: string;
   };
+  is_main_series: boolean;
 };
 
 export default function RegionSelector({
@@ -15,6 +16,7 @@ export default function RegionSelector({
   onSelectForm: (name: string) => void;
 }) {
   const [forms, setForms] = useState<string[]>([]);
+  const [originalForm, setOriginalForm] = useState<string | null>(null);
 
   useEffect(() => {
     if (!speciesUrl) return;
@@ -22,18 +24,29 @@ export default function RegionSelector({
     fetch(speciesUrl)
       .then((res) => res.json())
       .then((data) => {
-        const regionForms = data.varieties
-          .map((v: Variety) => v.pokemon.name)
-          .filter((name: string) => name.includes("-"));
+        // Find all varieties and separate regional forms from the original
+        const allForms = data.varieties.map((v: Variety) => v.pokemon.name);
+        
+        // Original form is the one without a hyphen (base form)
+        const original = allForms.find((name: string) => !name.includes("-"));
+        setOriginalForm(original || null);
 
+        // Regional forms are those with a hyphen
+        const regionForms = allForms.filter((name: string) => name.includes("-"));
         setForms(regionForms);
       });
   }, [speciesUrl]);
 
-  if (forms.length === 0) return null;
-
   return (
-    <div className="flex gap-2 mt-2">
+    <div className="flex gap-2 mt-2 mb-6 ml-14 flex-wrap" style={{ minHeight: "32px" }}>
+      {originalForm && (
+        <button
+          onClick={() => onSelectForm(originalForm)}
+          className="px-2 py-1 rounded bg-emerald-700 hover:bg-emerald-600 text-sm font-semibold"
+        >
+          Original
+        </button>
+      )}
       {forms.map((form) => (
         <button
           key={form}
