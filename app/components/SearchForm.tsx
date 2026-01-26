@@ -6,9 +6,10 @@ interface SearchFormProps {
   onQueryChange: (query: string) => void;
   onSearch: (e?: FormEvent) => void;
   onRandom: () => void;
+  onFilter: () => void;
 }
 
-export function SearchForm({ query, loading, onQueryChange, onSearch, onRandom }: SearchFormProps) {
+export function SearchForm({ query, loading, onQueryChange, onSearch, onRandom, onFilter }: SearchFormProps) {
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       e.preventDefault();
@@ -17,7 +18,7 @@ export function SearchForm({ query, loading, onQueryChange, onSearch, onRandom }
   };
 
   return (
-    <form onSubmit={onSearch} className="flex gap-2 mb-6 justify-center">
+    <form onSubmit={onSearch} className="flex gap-2 mb-6 justify-center flex-wrap">
       <input
         type="text"
         placeholder="Search by name or ID (e.g. pikachu, 25)"
@@ -39,6 +40,13 @@ export function SearchForm({ query, loading, onQueryChange, onSearch, onRandom }
         className="rounded-lg bg-purple-500 px-4 py-2 font-semibold text-slate-900 hover:bg-purple-400"
       >
         Random
+      </button>
+      <button
+        type="button"
+        onClick={onFilter}
+        className="rounded-lg bg-blue-500 px-4 py-2 font-semibold text-slate-900 hover:bg-blue-400"
+      >
+        Filter
       </button>
     </form>
   );

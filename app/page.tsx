@@ -14,6 +14,8 @@ import { SearchForm } from "./components/SearchForm";
 import { PokemonCard } from "./components/PokemonCard";
 import { Toast } from "./components/Toast";
 import RegionSelector from "./components/RegionSelector";
+import { FilterPanel, type FilterOptions } from "./components/FilterPanel";
+import { PokemonListView } from "./components/PokemonListView";
 
 type Gender = "male" | "female";
 type Shine = "normal" | "shiny";
@@ -50,6 +52,22 @@ export default function HomePage() {
   const [facing, setFacing] = useState<Facing>("front");
   const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
+  const [showFilterPanel, setShowFilterPanel] = useState(false);
+  const [filteredPokemon, setFilteredPokemon] = useState<Pokemon[]>([]);
+  const [showListView, setShowListView] = useState(false);
+
+  // Region to ID range mapping
+  const regionRanges: Record<string, [number, number]> = {
+    kanto: [1, 151],
+    johto: [152, 251],
+    hoenn: [252, 386],
+    sinnoh: [387, 493],
+    unova: [494, 649],
+    kalos: [650, 721],
+    alola: [722, 809],
+    galar: [810, 905],
+    paldea: [906, 1025],
+  };
 
   // Memoize rarity sets for O(1) lookups
   const raritySets = useMemo(() => ({
@@ -57,6 +75,83 @@ export default function HomePage() {
     ultra: new Set(ULTRA_BEAST_LIST),
     legendary: new Set(LEGENDARY_LIST),
   }), []);
+
+  // Build rarity map for filtered results
+  const buildRarityMap = useCallback((pokemonList: Pokemon[]) => {
+    const map: Record<number, Rarity> = {};
+    pokemonList.forEach((p) => {
+      if (raritySets.mythical.has(p.id)) {
+        map[p.id] = "mythical";
+      } else if (raritySets.ultra.has(p.id)) {
+        map[p.id] = "ultra";
+      } else if (raritySets.legendary.has(p.id)) {
+        map[p.id] = "legendary";
+      } else {
+        map[p.id] = "normal";
+      }
+    });
+    return map;
+  }, [raritySets]);
+
+  // Apply filters and fetch Pokemon
+  const applyFilters = useCallback(async (filters: FilterOptions) => {
+    setLoading(true);
+    setError(null);
+    setShowFilterPanel(false);
+
+    try {
+      const results: Pokemon[] = [];
+
+      // Fetch all Pokemon (up to 1025)
+      for (let id = 1; id <= 1025; id++) {
+        try {
+          const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`);
+          if (!res.ok) continue;
+
+          const data: Pokemon = await res.json();
+
+          // Check rarity filter
+          let pokemonRarity: Rarity = "normal";
+          if (raritySets.mythical.has(data.id)) {
+            pokemonRarity = "mythical";
+          } else if (raritySets.ultra.has(data.id)) {
+            pokemonRarity = "ultra";
+          } else if (raritySets.legendary.has(data.id)) {
+            pokemonRarity = "legendary";
+          }
+
+          if (
+            filters.rarity !== "all" &&
+            pokemonRarity !== filters.rarity
+          ) {
+            continue;
+          }
+
+          // Check type filter
+          const pokemonTypes = data.types.map((t) => t.type.name);
+
+          if (filters.types.length > 0) {
+            const hasAllTypes = filters.types.every((type) =>
+              pokemonTypes.includes(type)
+            );
+            if (!hasAllTypes) continue;
+          }
+
+          results.push(data);
+        } catch {
+          // Skip if error fetching individual Pokemon
+          continue;
+        }
+      }
+
+      setFilteredPokemon(results);
+      setShowListView(true);
+    } catch (err: any) {
+      setError(err.message || "Failed to apply filters");
+    } finally {
+      setLoading(false);
+    }
+  }, [raritySets]);
 
 const performSearch = useCallback(async (searchQuery: string) => {
   if (!searchQuery.trim()) return;
@@ -281,6 +376,7 @@ const handleSearch = useCallback(async (e?: FormEvent) => {
           onQueryChange={setQuery}
           onSearch={handleSearch}
           onRandom={getRandomPokemon}
+          onFilter={() => setShowFilterPanel(true)}
         />
 
         {pokemon && (
@@ -317,6 +413,22 @@ const handleSearch = useCallback(async (e?: FormEvent) => {
           </p>
         )}
       </div>
+
+      {showFilterPanel && (
+        <FilterPanel
+          onApplyFilter={applyFilters}
+          onClose={() => setShowFilterPanel(false)}
+        />
+      )}
+
+      {showListView && (
+        <PokemonListView
+          pokemon={filteredPokemon}
+          loading={loading}
+          rarityMap={buildRarityMap(filteredPokemon)}
+          onClose={() => setShowListView(false)}
+        />
+      )}
     </main>
   );
 }
