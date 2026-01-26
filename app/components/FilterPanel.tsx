@@ -8,6 +8,7 @@ interface FilterPanelProps {
 export interface FilterOptions {
   types: string[];
   rarity: "all" | "normal" | "legendary" | "ultra" | "mythical";
+  gen: "all" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9";
 }
 
 const TYPES = [
@@ -52,6 +53,7 @@ const typeColors: Record<string, string> = {
 export function FilterPanel({ onApplyFilter, onClose }: FilterPanelProps) {
   const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
   const [rarity, setRarity] = useState<"all" | "normal" | "legendary" | "ultra" | "mythical">("all");
+  const [gen, setGen] = useState<"all" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9">("all");
 
   const toggleType = (type: string) => {
     setSelectedTypes((prev) => {
@@ -69,6 +71,7 @@ export function FilterPanel({ onApplyFilter, onClose }: FilterPanelProps) {
     onApplyFilter({
       types: selectedTypes,
       rarity,
+      gen,
     });
   };
 
@@ -124,6 +127,28 @@ export function FilterPanel({ onApplyFilter, onClose }: FilterPanelProps) {
                 }`}
               >
                 {r}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Generation Filter */}
+        <div className="mb-6">
+          <label className="block text-sm font-semibold text-slate-300 mb-3">
+            Generation
+          </label>
+          <div className="grid grid-cols-5 gap-2">
+            {["all", "1", "2", "3", "4", "5", "6", "7", "8", "9"].map((g) => (
+              <button
+                key={g}
+                onClick={() => setGen(g as any)}
+                className={`py-2 px-3 rounded font-semibold text-sm transition ${
+                  gen === g
+                    ? "bg-emerald-500 text-slate-900"
+                    : "bg-slate-700 text-slate-100 hover:bg-slate-600"
+                }`}
+              >
+                {g === "all" ? "All" : `Gen ${g}`}
               </button>
             ))}
           </div>

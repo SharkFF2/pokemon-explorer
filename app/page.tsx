@@ -102,8 +102,28 @@ export default function HomePage() {
     try {
       const results: Pokemon[] = [];
 
-      // Fetch all Pokemon (up to 1025)
-      for (let id = 1; id <= 1025; id++) {
+      // Determine ID range based on generation
+      let minId = 1;
+      let maxId = 1025;
+
+      if (filters.gen !== "all") {
+        const genNum = parseInt(filters.gen);
+        const ranges = [
+          [1, 151],    // Gen 1
+          [152, 251],  // Gen 2
+          [252, 386],  // Gen 3
+          [387, 493],  // Gen 4
+          [494, 649],  // Gen 5
+          [650, 721],  // Gen 6
+          [722, 809],  // Gen 7
+          [810, 905],  // Gen 8
+          [906, 1025], // Gen 9
+        ];
+        [minId, maxId] = ranges[genNum - 1];
+      }
+
+      // Fetch Pokemon in the range
+      for (let id = minId; id <= maxId; id++) {
         try {
           const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`);
           if (!res.ok) continue;
