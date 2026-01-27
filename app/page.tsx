@@ -125,7 +125,12 @@ export default function HomePage() {
       // Fetch Pokemon in the range
       for (let id = minId; id <= maxId; id++) {
         try {
-          const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`);
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 5000);
+          
+          const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`, { signal: controller.signal });
+          clearTimeout(timeoutId);
+          
           if (!res.ok) continue;
 
           const data: Pokemon = await res.json();
@@ -167,7 +172,11 @@ export default function HomePage() {
       setFilteredPokemon(results);
       setShowListView(true);
     } catch (err: any) {
-      setError(err.message || "Failed to apply filters");
+      if (err instanceof TypeError || err.message.includes("Failed to fetch")) {
+        setError("No internet connection. Please check your connection and try again.");
+      } else {
+        setError(err.message || "Failed to apply filters");
+      }
     } finally {
       setLoading(false);
     }
@@ -181,9 +190,15 @@ const performSearch = useCallback(async (searchQuery: string) => {
   setPokemon(null);
 
   try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000);
+
     const res = await fetch(
-      `https://pokeapi.co/api/v2/pokemon/${searchQuery.toLowerCase().trim()}`
+      `https://pokeapi.co/api/v2/pokemon/${searchQuery.toLowerCase().trim()}`,
+      { signal: controller.signal }
     );
+    clearTimeout(timeoutId);
+
     if (!res.ok) {
       throw new Error("Pokémon not found");
     }
@@ -214,7 +229,13 @@ const performSearch = useCallback(async (searchQuery: string) => {
     setShine("normal");
     setFacing("front");
   } catch (err: any) {
-    setError(err.message || "Something went wrong");
+    if (err.name === "AbortError" || !navigator.onLine) {
+      setError("No internet connection. Please check your connection and try again.");
+    } else if (err instanceof TypeError || err.message.includes("Failed to fetch")) {
+      setError("No internet connection. Please check your connection and try again.");
+    } else {
+      setError(err.message || "Something went wrong");
+    }
   } finally {
     setLoading(false);
   }
@@ -244,8 +265,6 @@ const handleSearch = useCallback(async (e?: FormEvent) => {
 
   try {
     const rolledRarity = rollRarity();
-    // Note: rolledRarity is used to select the ID pool, but final rarity is determined by the actual Pokémon's ID
-
     let id: number;
 
     switch (rolledRarity) {
@@ -262,7 +281,13 @@ const handleSearch = useCallback(async (e?: FormEvent) => {
         id = Math.floor(Math.random() * 1025) + 1;
     }
 
-    const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`);
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000);
+
+    const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`, { signal: controller.signal });
+    clearTimeout(timeoutId);
+    
+    if (!res.ok) throw new Error("Failed to fetch Pokémon");
     if (!res.ok) throw new Error("Failed to fetch Pokémon");
 
     const data: Pokemon = await res.json();
@@ -303,8 +328,14 @@ const handleSearch = useCallback(async (e?: FormEvent) => {
       setToast("⭐ You found a SHINY Pokémon!");
     }
 
-  } catch {
-    setError("Failed to load random Pokémon");
+  } catch (err: any) {
+    if (err.name === "AbortError" || !navigator.onLine) {
+      setError("No internet connection. Please check your connection and try again.");
+    } else if (err instanceof TypeError || err.message.includes("Failed to fetch")) {
+      setError("No internet connection. Please check your connection and try again.");
+    } else {
+      setError("Failed to load random Pokémon");
+    }
   } finally {
     setLoading(false);
   }
@@ -367,7 +398,7 @@ const handleSearch = useCallback(async (e?: FormEvent) => {
     if (rarity === "mythical") return RARITIES[0].glowClass;
     if (rarity === "ultra") return RARITIES[1].glowClass;
     if (rarity === "legendary") return RARITIES[2].glowClass;
-    if (shine === "shiny") return "border-yellow-400 shadow-[0_0_20px_rgba(250,204,21,0.7)] bg-slate-900";
+    if (shine === "shiny") return "border-yellow-400 shadow-[0_0_70px_rgba(250,204,21,1)] bg-slate-900";
     return "border-slate-700 bg-slate-900";
   }, [pokemon, rarity, shine]);
 
@@ -384,10 +415,10 @@ const handleSearch = useCallback(async (e?: FormEvent) => {
   }, [pokemon, hasFemale, hasShiny, gender, shine]);
 
   return (
-    <main className={`min-h-screen bg-slate-900 text-slate-100 flex items-center justify-center p-4`}>
+    <main className={`min-h-screen bg-slate-900 text-slate-100 flex flex-col items-center p-4`}>
       <Toast message={toast} />
 
-      <div className="w-full max-w-3xl">
+      <div className="w-full max-w-3xl mt-8 md:mt-20">
         <h1 className="text-3xl font-bold mb-6 text-center">Pokémon Viewer</h1>
 
         <SearchForm

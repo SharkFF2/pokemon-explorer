@@ -39,6 +39,8 @@ export function PokemonCard({
   onFacingChange,
 }: PokemonCardProps) {
   // Type color logic for card background
+
+  
   const typeColors: Record<string, string> = {
     normal: '#A8A77A',
 	fire: '#EE8130',
@@ -92,9 +94,9 @@ export function PokemonCard({
   })();
 
   return (
-    <div className="relative flex flex-col md:flex-row gap-6 rounded-xl shadow-xl p-6 min-h-50 max-w-2xl mx-auto">
+    <div className="relative flex flex-col md:flex-row gap-3 md:gap-6 rounded-xl shadow-xl p-3 md:p-6 min-h-50 max-w-2xl mx-auto w-full">
       {backgroundElements}
-      <div className="relative z-10 flex flex-col md:flex-row gap-6">
+      <div className="relative z-10 flex flex-col md:flex-row gap-3 md:gap-6 w-full">
         <VariantControls
           gender={gender}
           shine={shine}
@@ -114,11 +116,13 @@ export function PokemonCard({
         />
 
         <div className="flex-1">
-          <div className="flex items-center gap-3 mb-2">
-            <h2 className="text-2xl font-bold capitalize whitespace-nowrap">
+          <div className="flex flex-col md:flex-row items-start md:items-center gap-2 md:gap-3 mb-2">
+            <h2 className="text-xl md:text-2xl font-bold capitalize whitespace-nowrap">
               {pokemon.name} <span className="text-white">#{pokemon.id}</span>
             </h2>
-            <RarityBadge rarity={rarity} isShiny={shine === "shiny"} />
+            <div className="flex flex-wrap gap-2">
+              <RarityBadge rarity={rarity} isShiny={shine === "shiny"} />
+            </div>
           </div>
 
           <StatsDisplay stats={pokemon.stats} />

@@ -9,6 +9,27 @@ interface PokemonListViewProps {
   onClose: () => void;
 }
 
+const typeColors: Record<string, string> = {
+  normal: "bg-gray-600",
+  fire: "bg-red-600",
+  water: "bg-blue-600",
+  electric: "bg-yellow-500",
+  grass: "bg-green-600",
+  ice: "bg-blue-300",
+  fighting: "bg-red-800",
+  poison: "bg-purple-600",
+  ground: "bg-yellow-800",
+  flying: "bg-sky-500",
+  psychic: "bg-pink-500",
+  bug: "bg-green-800",
+  rock: "bg-gray-700",
+  ghost: "bg-purple-900",
+  dragon: "bg-indigo-600",
+  dark: "bg-gray-900",
+  steel: "bg-gray-400",
+  fairy: "bg-pink-400",
+};
+
 const regionRanges: Record<string, { name: string; range: [number, number] }> = {
   kanto: { name: "Gen 1 - Kanto", range: [1, 151] },
   johto: { name: "Gen 2 - Johto", range: [152, 251] },
@@ -44,8 +65,8 @@ export function PokemonListView({
 
   if (selectedPokemon) {
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-        <div className="bg-slate-800 rounded-lg max-w-2xl w-full p-6 border border-slate-700">
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex flex-col items-center p-4 z-50 overflow-y-auto">
+        <div className="bg-slate-800 rounded-lg max-w-2xl w-full p-6 border border-slate-700 mt-8">
           <button
             onClick={() => setSelectedPokemon(null)}
             className="mb-4 px-4 py-2 rounded-lg bg-slate-700 text-slate-100 hover:bg-slate-600 font-semibold"
@@ -82,8 +103,8 @@ export function PokemonListView({
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-slate-800 rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto p-6 border border-slate-700">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex flex-col items-center p-4 z-50 overflow-y-auto">
+      <div className="bg-slate-800 rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto p-6 border border-slate-700 mt-8">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-bold text-slate-100">
             Filtered Pokémon ({pokemon.length})
@@ -117,12 +138,12 @@ export function PokemonListView({
                   <h3 className="text-lg font-bold text-emerald-400 mb-4 pb-2 border-b border-slate-700">
                     {regionData.name}
                   </h3>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 sm:gap-4">
                     {pokemonInRegion.map((p) => (
                       <button
                         key={p.id}
                         onClick={() => setSelectedPokemon(p)}
-                        className="p-4 rounded-lg bg-slate-700 hover:bg-slate-600 transition border border-slate-600 hover:border-emerald-500 relative"
+                        className="p-2 sm:p-4 rounded-lg bg-slate-700 hover:bg-slate-600 transition border border-slate-600 hover:border-emerald-500 relative overflow-hidden"
                       >
                         {rarityMap[p.id] !== "normal" && (
                           <div className="absolute top-2 right-2">
@@ -143,7 +164,7 @@ export function PokemonListView({
                           <img
                             src={p.sprites.front_default || ""}
                             alt={p.name}
-                            className="w-20 h-20"
+                            className="w-16 sm:w-20 h-16 sm:h-20"
                           />
                           <div>
                             <p className="font-semibold text-slate-100 capitalize">
@@ -151,11 +172,13 @@ export function PokemonListView({
                             </p>
                             <p className="text-xs text-slate-400">#{p.id}</p>
                           </div>
-                          <div className="flex flex-wrap gap-1 justify-center">
+                          <div className="flex flex-wrap gap-0.5 justify-center max-w-full">
                             {p.types.map((t) => (
                               <span
                                 key={t.type.name}
-                                className="text-xs px-2 py-1 rounded bg-slate-600 text-slate-200 capitalize"
+                                className={`text-xs px-1.5 py-0.5 rounded text-white capitalize font-semibold ${
+                                  typeColors[t.type.name] || "bg-slate-600"
+                                }`}
                               >
                                 {t.type.name}
                               </span>

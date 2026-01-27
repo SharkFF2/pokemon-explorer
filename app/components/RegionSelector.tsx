@@ -38,24 +38,27 @@ export default function RegionSelector({
   }, [speciesUrl]);
 
   return (
-    <div className="flex gap-2 mt-2 mb-6 ml-14 flex-wrap" style={{ minHeight: "32px" }}>
-      {originalForm && (
-        <button
-          onClick={() => onSelectForm(originalForm)}
-          className="px-2 py-1 rounded bg-emerald-700 hover:bg-emerald-600 text-sm font-semibold"
-        >
-          Original
-        </button>
-      )}
-      {forms.map((form) => (
-        <button
-          key={form}
-          onClick={() => onSelectForm(form)}
-          className="px-2 py-1 rounded bg-zinc-800 hover:bg-zinc-700 text-sm"
-        >
-          {form.split("-")[1]}
-        </button>
-      ))}
+    <div className="mt-2 mb-6">
+      <p className="text-sm font-semibold text-slate-300 mb-2 ml-8">Variants:</p>
+      <div className="flex gap-1.5 flex-wrap ml-12">
+        {originalForm && (
+          <button
+            onClick={() => onSelectForm(originalForm)}
+            className="px-2.5 py-1.5 rounded bg-emerald-700 hover:bg-emerald-600 text-xs md:text-sm font-semibold whitespace-nowrap"
+          >
+            Original
+          </button>
+        )}
+        {forms.map((form) => (
+          <button
+            key={form}
+            onClick={() => onSelectForm(form)}
+            className="px-2.5 py-1.5 rounded bg-zinc-800 hover:bg-zinc-700 text-xs md:text-sm font-semibold whitespace-nowrap"
+          >
+            {form.split("-")[1]}
+          </button>
+        ))}
+      </div>
     </div>
   );
 }

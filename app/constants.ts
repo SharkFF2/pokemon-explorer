@@ -44,21 +44,21 @@ export const RARITIES: RarityConfig[] = [
     chance: 0.005,
     toast: "🌸 You found a MYTHICAL Pokémon!",
     badgeClass: "bg-pink-600 text-white",
-    glowClass: "border-pink-500 shadow-[0_0_20px_rgba(236,72,153,0.7)] bg-slate-900",
+    glowClass: "border-pink-800 shadow-[0_0_70px_rgba(239,68,68,3)] bg-slate-900",
   },
   {
     key: "ultra",
     chance: 0.01,
     toast: "🔥 You found an ULTRA BEAST!",
     badgeClass: "bg-red-600 text-white",
-    glowClass: "border-red-500 shadow-[0_0_20px_rgba(239,68,68,0.7)] bg-slate-900",
+    glowClass: "border-red-800 shadow-[0_0_70px_rgba(239,68,68,3)] bg-slate-900",
   },
   {
     key: "legendary",
     chance: 0.01,
     toast: "✨ You found a LEGENDARY Pokémon!",
     badgeClass: "bg-purple-600 text-white",
-    glowClass: "border-purple-500 shadow-[0_0_20px_rgba(168,85,247,0.7)] bg-slate-900",
+    glowClass: "border-purple-800 shadow-[0_0_70px_rgba(168,85,247,3)] bg-slate-900",
   },
 ];
 
