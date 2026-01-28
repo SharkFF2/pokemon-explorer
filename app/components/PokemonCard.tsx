@@ -94,7 +94,7 @@ export function PokemonCard({
   })();
 
   return (
-    <div className="relative flex flex-col md:flex-row gap-3 md:gap-6 rounded-xl shadow-xl p-3 md:p-6 min-h-50 max-w-2xl mx-auto w-full">
+    <div className="relative flex flex-col md:flex-row gap-3 md:gap-6 rounded-xl shadow-xl p-3 md:p-6 min-h-50 max-w-4xl mx-auto w-full">
       {backgroundElements}
       <div className="relative z-10 flex flex-col md:flex-row gap-3 md:gap-6 w-full">
         <VariantControls

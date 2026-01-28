@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { Pokemon } from "../../types/pokemon";
 import { PokemonCard } from "./PokemonCard";
+import RegionSelector from "./RegionSelector";
 
 interface PokemonListViewProps {
   pokemon: Pokemon[];
@@ -63,48 +64,24 @@ export function PokemonListView({
   const [shine, setShine] = useState<"normal" | "shiny">("normal");
   const [facing, setFacing] = useState<"front" | "back">("front");
 
-  if (selectedPokemon) {
-    return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex flex-col items-center p-4 z-50 overflow-y-auto">
-        <div className="bg-slate-800 rounded-lg max-w-2xl w-full p-6 border border-slate-700 mt-8">
-          <button
-            onClick={() => setSelectedPokemon(null)}
-            className="mb-4 px-4 py-2 rounded-lg bg-slate-700 text-slate-100 hover:bg-slate-600 font-semibold"
-          >
-            ← Back to List
-          </button>
-          <PokemonCard
-            pokemon={selectedPokemon}
-            rarity={rarityMap[selectedPokemon.id] || "normal"}
-            gender={gender}
-            shine={shine}
-            facing={facing}
-            hasFemale={
-              selectedPokemon.sprites.front_female !== null ||
-              selectedPokemon.sprites.back_female !== null ||
-              selectedPokemon.sprites.front_shiny_female !== null ||
-              selectedPokemon.sprites.back_shiny_female !== null
-            }
-            hasShiny={
-              selectedPokemon.sprites.front_shiny !== null ||
-              selectedPokemon.sprites.back_shiny !== null ||
-              selectedPokemon.sprites.front_shiny_female !== null ||
-              selectedPokemon.sprites.back_shiny_female !== null
-            }
-            spriteUrl={getSpriteUrl(selectedPokemon, gender, shine, facing)}
-            glowClass={getGlowClass(rarityMap[selectedPokemon.id] || "normal", shine)}
-            onGenderChange={setGender}
-            onShineChange={setShine}
-            onFacingChange={setFacing}
-          />
-        </div>
-      </div>
-    );
-  }
+  const handleSelectForm = async (formName: string) => {
+    try {
+      const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${formName}`);
+      if (res.ok) {
+        const data: Pokemon = await res.json();
+        setSelectedPokemon(data);
+        setGender("male");
+        setShine("normal");
+        setFacing("front");
+      }
+    } catch {
+      // Keep the current Pokemon if fetch fails
+    }
+  };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex flex-col items-center p-4 z-50 overflow-y-auto">
-      <div className="bg-slate-800 rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto p-6 border border-slate-700 mt-8">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex flex-col items-center justify-center p-4 z-50">
+      <div className={`bg-slate-800 rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto p-6 border border-slate-700 transition-all ${selectedPokemon ? 'blur-sm' : ''}`}>
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-bold text-slate-100">
             Filtered Pokémon ({pokemon.length})
@@ -194,6 +171,49 @@ export function PokemonListView({
           </div>
         )}
       </div>
+
+      {selectedPokemon && (
+        <div className="fixed inset-0 flex items-center justify-center p-4 pointer-events-none z-60">
+          <div className="bg-slate-800 rounded-lg max-w-2xl w-full p-6 border border-slate-700 shadow-2xl pointer-events-auto">
+            <button
+              onClick={() => setSelectedPokemon(null)}
+              className="mb-4 px-4 py-2 rounded-lg bg-slate-700 text-slate-100 hover:bg-slate-600 font-semibold"
+            >
+              ← Back to List
+            </button>
+            {selectedPokemon && (
+              <RegionSelector
+                speciesUrl={selectedPokemon.species.url}
+                onSelectForm={handleSelectForm}
+              />
+            )}
+            <PokemonCard
+              pokemon={selectedPokemon}
+              rarity={rarityMap[selectedPokemon.id] || "normal"}
+              gender={gender}
+              shine={shine}
+              facing={facing}
+              hasFemale={
+                selectedPokemon.sprites.front_female !== null ||
+                selectedPokemon.sprites.back_female !== null ||
+                selectedPokemon.sprites.front_shiny_female !== null ||
+                selectedPokemon.sprites.back_shiny_female !== null
+              }
+              hasShiny={
+                selectedPokemon.sprites.front_shiny !== null ||
+                selectedPokemon.sprites.back_shiny !== null ||
+                selectedPokemon.sprites.front_shiny_female !== null ||
+                selectedPokemon.sprites.back_shiny_female !== null
+              }
+              spriteUrl={getSpriteUrl(selectedPokemon, gender, shine, facing)}
+              glowClass={getGlowClass(rarityMap[selectedPokemon.id] || "normal", shine)}
+              onGenderChange={setGender}
+              onShineChange={setShine}
+              onFacingChange={setFacing}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
