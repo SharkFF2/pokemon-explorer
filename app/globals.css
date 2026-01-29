@@ -1,1 +1,36 @@
 @import "tailwindcss";
+@tailwind utilities;
+@layer utilities {
+  .glass {
+    @apply bg-white/5 backdrop-blur-xl border border-white/10;
+  }
+}
+
+@layer utilities {
+  @keyframes pulseGlow {
+    0%, 100% {
+      box-shadow: 0 0 10px rgb(255, 255, 0);
+    }
+    50% {
+      box-shadow: 0 0 20px rgb(255, 255, 0);
+    }
+  }
+
+  .pulse-glow {
+    animation: pulseGlow 2s infinite ease-in-out;
+  }
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  @apply bg-gradient-to-br from-[#070b1a] via-[#0b1026] to-[#12092e]
+         text-white antialiased;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #3b82f6 transparent;
+}
