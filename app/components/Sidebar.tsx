@@ -1,7 +1,8 @@
 import { useState } from "react"
 import { Variant } from "../page"
-import { FormButton } from "../Components/FormButton"
+import { FormButton } from "../components/FormButton"
 import {PokemonForm} from "@/types/forms"
+import { FilterPanel } from "./FilterPanel"
 
 
 type SidebarProps = {
@@ -24,6 +25,7 @@ export function Sidebar({
 }: SidebarProps) {
 
   const [query, setQuery] = useState("")
+  const [showFilter, setShowFilter] = useState(false)
 
   function Section({
   title,
@@ -88,24 +90,37 @@ function SegmentButton({
       <input
         value={query}
         onChange={(e) => setQuery(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" && query.trim()) {
+            onSearch(query)
+          }
+        }}
         className="glass rounded-lg px-4 py-2 bg-transparent outline-none"
         placeholder="Search by name or ID"
       />
 
       {/* Actions */}
-      <div className="flex gap-2">
+      <div className="flex gap-2 w-full">
         <button
           onClick={() => onSearch(query)}
-          className="glass px-4 py-2 rounded-lg"
+          disabled={!query.trim()}
+          className="glass px-4 py-2 rounded-lg flex-1 text-center disabled:opacity-40 disabled:cursor-not-allowed"
         >
           Search
         </button>
 
         <button
-          onClick={() => onSearch(String(Math.floor(Math.random() * 1010) + 1))}
-          className="glass px-4 py-2 rounded-lg"
+          onClick={() => onSearch(String(Math.floor(Math.random() * 1025) + 1))}
+          className="glass px-4 py-2 rounded-lg flex-1 text-center"
         >
           Random
+        </button>
+
+        <button
+          onClick={() => setShowFilter(true)}
+          className="glass px-4 py-2 rounded-lg flex-1 text-center"
+        >
+          Filter
         </button>
       </div>
 
@@ -170,11 +185,23 @@ function SegmentButton({
             onClick={() => onFormChange?.("paldea")}
             icon="/icons/paldea.svg"
           >
-  Paldean
-</FormButton>
+            Paldean
+        </FormButton>
+      </div>
+       
+       
+        {/*Filter panel trigger*/}
+          </Section>
+            {showFilter && (
+          <FilterPanel
+             onApplyFilter={(filters) => {
 
-        </div>
-      </Section>
+            console.log(filters)
+            setShowFilter(false)
+          }}
+            onClose={() => setShowFilter(false)}
+        />
+)}
     </div>
   </div>
   )

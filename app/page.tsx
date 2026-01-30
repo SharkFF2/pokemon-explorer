@@ -1,8 +1,8 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Sidebar } from "./Components/Sidebar"
-import { PanelLayout } from "./Components/PokemonDisplay"
+import { Sidebar } from "./components/Sidebar"
+import { PanelLayout } from "./components/PokemonDisplay"
 import { fetchPokemon } from "@/lib/pokeapi"
 import type { Pokemon } from "@/types/pokemon"
 import { buildFormQuery } from "@/lib/buildFormQuery"
@@ -20,36 +20,55 @@ export default function Home() {
   const [form, setForm] = useState<PokemonForm>("normal")
   const [baseName, setBaseName] = useState<string>("")
   const [availableForms, setAvailableForms] = useState<PokemonForm[]>(["normal"])
+  const [isLoadingNewPokemon, setIsLoadingNewPokemon] = useState<boolean>(false)
+
   
 
   async function handleSearch(query: string) {
   try {
     setError(null)
-    setBaseName(query.toLowerCase())
+    setIsLoadingNewPokemon(true)   // prevent effect from firing
 
-    const finalQuery = buildFormQuery(query, form) // <— form comes from your state
-    const data = await fetchPokemon(finalQuery)
+    const name = query.toLowerCase()
+    setBaseName(name)
+    setForm("normal")              // reset form immediately
+
+    const data = await fetchPokemon(name)
     setPokemon(data)
 
     const forms: PokemonForm[] = ["normal"]
     const testForms: PokemonForm[] = ["alola", "galar", "hisui", "paldea", "mega", "gmax"]
 
     for (const f of testForms) {
-      const q = buildFormQuery(query, f)
+      const q = buildFormQuery(name, f)
       const req = await fetch(`https://pokeapi.co/api/v2/pokemon/${q}`)
-        if (req.ok) forms.push(f)
+      if (req.ok) forms.push(f)
     }
-    setAvailableForms(forms)
 
+    setAvailableForms(forms)
   } catch {
     setError("Pokémon not found")
+  } finally {
+    setIsLoadingNewPokemon(false)  // allow effect again
   }
 }
 
-  useEffect(() => {
-    if (!baseName) return
-      handleSearch(baseName)
-    }, [form])
+ useEffect(() => {
+  if (!baseName) return
+  if (isLoadingNewPokemon) return   // <-- prevents the flicker
+
+  async function loadForm() {
+    try {
+      const q = buildFormQuery(baseName, form)
+      const data = await fetchPokemon(q)
+      setPokemon(data)
+    } catch {
+      setError("Pokémon not found")
+    }
+  }
+
+  loadForm()
+}, [form, baseName, isLoadingNewPokemon])
 
   return (
     <main className="h-screen grid grid-cols-[280px_1fr] gap-6 p-6">
@@ -61,6 +80,7 @@ export default function Home() {
         form={form}
         onFormChange={setForm}
         availableForms={availableForms}
+        
         />
       </aside>
 

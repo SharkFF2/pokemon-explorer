@@ -21,7 +21,7 @@ export function FormButton({
           ? "bg-indigo-500/20 text-indigo-300"
           : "opacity-60 hover:opacity-100"
         }
-        ${disabled ? "opacity-30 cursor-not-allowed" : "opacity-100 cursor-pointer"}
+        ${disabled ? "opacity-30 grayscale cursor-not-allowed bg-gray-300 text-gray-600" : "opacity-100 pulse-glow cursor-pointer"}
       `}
     >
       {children}
