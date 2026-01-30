@@ -9,6 +9,7 @@ import { buildFormQuery } from "@/lib/buildFormQuery"
 import type { PokemonForm } from "@/types/forms"
 
 
+
 export type Variant = "normal" | "shiny"
 
 
