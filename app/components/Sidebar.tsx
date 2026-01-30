@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { Variant } from "../page"
-import { FormButton } from "./FormButton"
+import { FormButton } from "../Components/FormButton"
 import {PokemonForm} from "@/types/forms"
 
 

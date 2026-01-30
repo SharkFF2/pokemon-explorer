@@ -1,8 +1,8 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Sidebar } from "./components/Sidebar"
-import { PanelLayout } from "./components/PokemonDisplay"
+import { Sidebar } from "./Components/Sidebar"
+import { PanelLayout } from "./Components/PokemonDisplay"
 import { fetchPokemon } from "@/lib/pokeapi"
 import type { Pokemon } from "@/types/pokemon"
 import { buildFormQuery } from "@/lib/buildFormQuery"
