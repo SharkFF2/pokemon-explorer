@@ -7,7 +7,6 @@ import { fetchPokemon } from "@/lib/pokeapi"
 import type { Pokemon } from "@/types/pokemon"
 import { buildFormQuery } from "@/lib/buildFormQuery"
 import type { PokemonForm } from "@/types/forms"
-import build from "next/dist/build"
 
 
 export type Variant = "normal" | "shiny"
